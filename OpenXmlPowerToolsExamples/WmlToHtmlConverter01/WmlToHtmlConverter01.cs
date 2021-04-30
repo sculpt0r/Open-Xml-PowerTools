@@ -27,17 +27,19 @@ class WmlToHtmlConverterHelper
     static void Main(string[] args)
     {
         var n = DateTime.Now;
-        var tempDi = new DirectoryInfo(string.Format("ExampleOutput-{0:00}-{1:00}-{2:00}-{3:00}{4:00}{5:00}", n.Year - 2000, n.Month, n.Day, n.Hour, n.Minute, n.Second));
+        var tempDi = new DirectoryInfo("sampleOutput");
         tempDi.Create();
 
         /*
          * This example loads each document into a byte array, then into a memory stream, so that the document can be opened for writing without
          * modifying the source document.
          */
-        foreach (var file in Directory.GetFiles("../../", "*.docx"))
-        {
-            ConvertToHtml(file, tempDi.FullName);
-        }
+        //foreach (var file in Directory.GetFiles("../../../", "*.docx"))
+        //{
+        //    ConvertToHtml(file, tempDi.FullName);
+        //}
+		var file = Path.Combine("../../../", "SourceCommentAndTrack.docx");
+		ConvertToHtml(file, tempDi.FullName);
     }
 
     public static void ConvertToHtml(string file, string outputDirectory)
@@ -149,7 +151,7 @@ class WmlToHtmlConverterHelper
                 // If you further transform the XML tree returned by ConvertToHtmlTransform, you
                 // must do it correctly, or entities will not be serialized properly.
 
-                var htmlString = html.ToString(SaveOptions.DisableFormatting);
+                var htmlString = html.ToString(SaveOptions.None);
                 File.WriteAllText(destFileName.FullName, htmlString, Encoding.UTF8);
             }
         }
