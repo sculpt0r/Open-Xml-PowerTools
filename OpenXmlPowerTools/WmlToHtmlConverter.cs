@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using CKS_Converter;
 using DocumentFormat.OpenXml.Packaging;
 
 // 200e lrm - LTR
@@ -145,17 +147,17 @@ namespace OpenXmlPowerTools
 
         public static XElement ConvertToHtml(WordprocessingDocument wordDoc, WmlToHtmlConverterSettings htmlConverterSettings)
         {
-            RevisionAccepter.AcceptRevisions(wordDoc);
+            //RevisionAccepter.AcceptRevisions(wordDoc);
             SimplifyMarkupSettings simplifyMarkupSettings = new SimplifyMarkupSettings
             {
-                RemoveComments = true,
+                RemoveComments = false,
                 RemoveContentControls = true,
                 RemoveEndAndFootNotes = true,
                 RemoveFieldCodes = false,
                 RemoveLastRenderedPageBreak = true,
                 RemovePermissions = true,
                 RemoveProof = true,
-                RemoveRsidInfo = true,
+                RemoveRsidInfo = false,
                 RemoveSmartTags = true,
                 RemoveSoftHyphens = true,
                 RemoveGoBackBookmark = true,
@@ -191,10 +193,11 @@ namespace OpenXmlPowerTools
             AdjustTableBorders(wordDoc);
             XElement rootElement = wordDoc.MainDocumentPart.GetXDocument().Root;
             FieldRetriever.AnnotateWithFieldInfo(wordDoc.MainDocumentPart);
-            AnnotateForSections(wordDoc);
 
             XElement xhtml = (XElement)ConvertToHtmlTransform(wordDoc, htmlConverterSettings,
                 rootElement, false, 0m);
+
+
 
             ReifyStylesAndClasses(htmlConverterSettings, xhtml);
 
@@ -380,19 +383,31 @@ namespace OpenXmlPowerTools
             // there but possibly empty), and other meta tags.
             if (element.Name == W.document)
             {
+                var comments = Helpers.GetComments(wordDoc);
+                var htmlComments = comments.Select(c => c.toHtml());
+
+                var pageTitle = settings.PageTitle != null
+                             ? new XElement(Xhtml.title, new XText(settings.PageTitle))
+                             : new XElement(Xhtml.title, new XText(string.Empty));
+
+                var content = element.Elements()
+                        .Select(e => ConvertToHtmlTransform(wordDoc, settings, e, false, currentMarginLeft)
+                        );
+
+
+
                 return new XElement(Xhtml.html,
                     new XElement(Xhtml.head,
                         new XElement(Xhtml.meta, new XAttribute("charset", "UTF-8")),
-                        settings.PageTitle != null
-                            ? new XElement(Xhtml.title, new XText(settings.PageTitle))
-                            : new XElement(Xhtml.title, new XText(string.Empty)),
+                        pageTitle,
                         new XElement(Xhtml.meta,
                             new XAttribute("name", "Generator"),
                             new XAttribute("content", "PowerTools for Open XML"))),
-                    element.Elements()
-                        .Select(e => ConvertToHtmlTransform(wordDoc, settings, e, false, currentMarginLeft)));
+                    htmlComments,
+                    content
+                );
             }
-
+            //Console.WriteLine(element.Name);
             // Transform the w:body element to the XHTML h:body element.
             if (element.Name == W.body)
             {
@@ -428,6 +443,13 @@ namespace OpenXmlPowerTools
                 {
                     return element.Elements().Select(e => ConvertToHtmlTransform(wordDoc, settings, e, false, currentMarginLeft));
                 }
+            }
+
+            if(element.Name == W.rPrChange)
+            {
+                var v = element.Attribute(XName.Get("author")).Value;
+                Console.WriteLine("asd" + v);
+                return new XText(v + element.Value);
             }
 
             // Transform hyperlinks to bookmarks to the XHTML h:a element.
