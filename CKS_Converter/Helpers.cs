@@ -39,7 +39,7 @@ namespace CKS_Converter
         }
         #endregion
 
-        private static void GetComments(WordprocessingDocument doc)
+        public static void GetComments(WordprocessingDocument doc)
         {
             var xDoc = doc.MainDocumentPart.WordprocessingCommentsPart.GetXDocument();
             var commentNodes = xDoc.Descendants().Elements(W.comment);
