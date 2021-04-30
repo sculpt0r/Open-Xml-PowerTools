@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -40,7 +43,8 @@ namespace CKS_Converter
         {
             var xDoc = doc.MainDocumentPart.WordprocessingCommentsPart.GetXDocument();
             var commentNodes = xDoc.Descendants().Elements(W.comment);
-            commentNodes.ToList().ForEach(cn => {
+            commentNodes.ToList().ForEach(cn =>
+            {
                 Console.WriteLine(cn);
                 Console.WriteLine("*** *** ***");
 
@@ -59,5 +63,14 @@ namespace CKS_Converter
             // }
             // Console.WriteLine(comments);
         }
+    }
+
+    public static class W
+    {
+        public static readonly XNamespace w =
+            "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        public static readonly XName comment = w + "comment";
+        public static readonly XName r = w + "r";
+        public static readonly XName t = w + "t";
     }
 }
