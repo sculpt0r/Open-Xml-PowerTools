@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ProjectGuid>{7E2B7C79-F89B-40F8-AC66-5E622193AE06}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <RootNamespace>CKS_Converter</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
