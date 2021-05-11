@@ -150,11 +150,13 @@ namespace OpenXmlPowerTools
             //RevisionAccepter.AcceptRevisions(wordDoc);
             SimplifyMarkupSettings simplifyMarkupSettings = new SimplifyMarkupSettings
             {
+                AcceptRevisions = false,
                 RemoveComments = false,
                 RemoveContentControls = true,
                 RemoveEndAndFootNotes = true,
                 RemoveFieldCodes = false,
                 RemoveLastRenderedPageBreak = true,
+                RemoveMarkupForDocumentComparison = false,
                 RemovePermissions = true,
                 RemoveProof = true,
                 RemoveRsidInfo = false,
@@ -376,7 +378,7 @@ namespace OpenXmlPowerTools
         {
             var element = node as XElement;
             if (element == null) return null;
-
+            Console.WriteLine(element.Name);
             // Transform the w:document element to the XHTML h:html element.
             // The h:head element is laid out based on the W3C's recommended layout, i.e.,
             // the charset (using the HTML5-compliant form), the title (which is always
